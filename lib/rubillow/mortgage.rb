@@ -71,5 +71,33 @@ module Rubillow
     
       Models::MonthlyPayments.new(Rubillow::Request.get("GetMonthlyPayments", options))
     end
+
+    def self.monthly_payments_advanced(options = {})
+      options = {
+          :zws_id => Rubillow.configuration.zwsid,
+          :price => nil,
+          :down => nil,
+          :amount => nil,
+          :rate => nil,
+          :schedule => nil,
+          :terminmonths => nil,
+          :propertytax => nil,
+          :hazard => nil,
+          :pmi => nil,
+          :hoa => nil,
+          :zip => nil
+      }.merge!(options)
+
+      options[:output] = 'xml'
+
+      if options[:price].nil?
+        raise ArgumentError, "The price option is required"
+      end
+      if options[:down].nil? && options[:amount].nil?
+        raise ArgumentError, "Either the down or amount option is required"
+      end
+
+      Models::MonthlyPaymentsAdvanced.new(Rubillow::Request.get("mortgage/CalculateMonthlyPaymentsAdvanced", options))
+    end
   end
 end
