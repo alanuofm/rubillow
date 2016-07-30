@@ -11,6 +11,7 @@ module Rubillow
       attr_accessor :total_interest
       attr_accessor :total_principal
       attr_accessor :total_taxes_fees_and_insurance
+      attr_accessor :payments
 
       def parse
         super
@@ -27,6 +28,19 @@ module Rubillow
         @total_interest = @parser.xpath('//totalinterest').text
         @total_principal = @parser.xpath('//totalprincipal').text
         @total_taxes_fees_and_insurance = @parser.xpath('//totaltaxesfeesandinsurance').text
+
+        @payments = []
+        @parser.xpath('//amortizationschedule/payment').each do | payment |
+          temp_parser = Nokogiri::XML(payment.to_xml){|cfg|cfg.noblanks}
+          temp_payment = {
+              :beginning_balance => temp_parser.xpath('//beginningbalance').text,
+              :amount => temp_parser.xpath('//amount').text,
+              :principal => temp_parser.xpath('//principal').text,
+              :interest => temp_parser.xpath('//interest').text,
+              :ending_balance => temp_parser.xpath('//endingbalance').text
+          }
+          @payments << temp_payment
+        end
       end
     end
   end
